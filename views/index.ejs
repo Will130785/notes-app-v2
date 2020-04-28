@@ -5,6 +5,21 @@
         <h1>Notes</h1>
         <a href="/notes/new">Add note</a>
     </div>
+
+    <div class="card note-container">
+
+        <% notes.forEach(note => { %>
+            <div class="card note">
+                <h3><%= note.title %></h3>
+                <p><%= note.content %></p>
+                <div class="note-media">
+                    <img src="<%= note.media %>" class="media-pic">
+                </div>
+                <a href="/notes/<%= note._id %>" class="btn btn-success">View note</a>
+            </div>
+
+        <% }) %>
+    </div>
 </div>
 
 <%- include("partials/footer") %>

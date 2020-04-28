@@ -1,0 +1,12 @@
+.note-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.note {
+    grid-column: span 1;
+}
+
+.media-pic {
+    width: 100%;
+}
