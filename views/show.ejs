@@ -7,10 +7,13 @@
         <div class="media">
             <img src="<%= note.media %>" class="media-pic">
         </div>
-        <a href="/notes/<%= note._id %>/edit" class="btn btn-warning">Edit</a>
+        <% if(currentUser && note.author.id.equals(currentUser._id)) { %>
+            <a href="/notes/<%= note._id %>/edit" class="btn btn-warning">Edit</a>
         <form action="/notes/<%= note._id %>?_method=DELETE" method="POST">
             <input type="submit" class="btn btn-danger" value="Delete">
         </form>
+
+        <% } %>
     </div>
 </div>
 

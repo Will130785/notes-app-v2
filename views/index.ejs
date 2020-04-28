@@ -9,14 +9,17 @@
     <div class="card note-container">
 
         <% notes.forEach(note => { %>
-            <div class="card note">
-                <h3><%= note.title %></h3>
-                <p><%= note.content %></p>
-                <div class="note-media">
-                    <img src="<%= note.media %>" class="media-pic">
+            <% if(currentUser && note.author.id.equals(currentUser._id)) { %>
+                <div class="card note">
+                    <h3><%= note.title %></h3>
+                    <p><%= note.content %></p>
+                    <div class="note-media">
+                        <img src="<%= note.media %>" class="media-pic">
+                    </div>
+                    <a href="/notes/<%= note._id %>" class="btn btn-success">View note</a>
                 </div>
-                <a href="/notes/<%= note._id %>" class="btn btn-success">View note</a>
-            </div>
+
+            <% } %>
 
         <% }) %>
     </div>

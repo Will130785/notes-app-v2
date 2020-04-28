@@ -1,3 +1,14 @@
+body {
+    background-image: linear-gradient(to right bottom,
+                                     rgba(255, 255, 255, .7),
+                                      rgba(255, 255, 255, .7)),
+                                       url("https://images.unsplash.com/photo-1454166155302-ef4863c27e70?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=900&q=60");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+}
+
 .note-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

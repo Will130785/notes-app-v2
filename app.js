@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const passport = require("passport");
+const localStrategy = require("passport-local");
 const methodOverride = require("method-override");
 let Note = require("./models/Note");
+let User = require("./models/User");
 const app = express();
 
 //APP CONFIG
@@ -16,6 +19,23 @@ mongoose.connect("mongodb://localhost/notes-app", {useNewUrlParser: true, useUni
 app.use(bodyParser.urlencoded({extended: true}));
 //Set method overrride
 app.use(methodOverride("_method"));
+//PASSPORT CONFIG
+app.use(require("express-session")({
+    secret: "This is a notes application",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//Make current user available to all pages
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    next();
+});
 
 //ROUTES
 //LANDING PAGE
@@ -36,21 +56,27 @@ app.get("/notes", (req, res) => {
 });
 
 //NEW
-app.get("/notes/new", (req, res) => {
+app.get("/notes/new", isLoggedIn, (req, res) => {
     res.render("new");
 });
 
 //CREATE
-app.post("/notes", (req, res) => {
+app.post("/notes", isLoggedIn, (req, res) => {
     //Get data from form
     let title = req.body.title;
     let content = req.body.content;
     let media = req.body.media;
+    //Create author and capture user data
+    let author = {
+        id: req.user._id,
+        username: req.user.username
+    }
     //Create new note object
     let newNote = {
         title: title,
         content: content,
-        media: media
+        media: media,
+        author: author
     };
 
 //Create new database note
@@ -78,7 +104,7 @@ app.get("/notes/:id", (req, res) => {
 });
 
 //EDIT
-app.get("/notes/:id/edit", (req, res) => {
+app.get("/notes/:id/edit", checkNoteOwnership, (req, res) => {
     //Find note in DB
     Note.findById(req.params.id, (err, foundNote) => {
         if(err) {
@@ -91,7 +117,7 @@ app.get("/notes/:id/edit", (req, res) => {
 });
 
 //UPDATE
-app.put("/notes/:id", (req, res) => {
+app.put("/notes/:id", checkNoteOwnership, (req, res) => {
     //Get data from form
     let title = req.body.title;
     let content = req.body.content;
@@ -115,7 +141,7 @@ app.put("/notes/:id", (req, res) => {
 });
 
 //DESTROY
-app.delete("/notes/:id", (req, res) => {
+app.delete("/notes/:id", checkNoteOwnership, (req, res) => {
     //Find item in DB and delete
     Note.findByIdAndRemove(req.params.id, (err, note) => {
         if(err) {
@@ -134,7 +160,19 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-    res.send("This will be a registered user");
+    //Create new user
+    let newUser = new User({username: req.body.username});
+    //Register new user
+    User.register(newUser, req.body.password, (err, user) => {
+        if(err) {
+            console.log(err);
+        } else {
+            //Authenticate user with passport-local
+            passport.authenticate("local")(req, res, function() {
+                res.redirect("/notes");
+            });
+        }
+    })
 });
 
 //LOGIN
@@ -142,19 +180,54 @@ app.get("/login", (req, res) => {
     res.render("login");
 });
 
-app.post("/login", (req, res) => {
-    res.send("This will be a logged in user");
+app.post("/login", passport.authenticate("local",
+{
+    successRedirect: "/notes",
+    failureRedirect: "/login"
+}), (req, res) => {
+
 });
 
 //LOGOUT
 app.get("/logout", (req, res) => {
-    res.send("This will be a logged out user");
+    req.logout();
+    res.redirect("/notes");
 });
 
 //WRONG PAGE
 app.get("*", (req, res) => {
     res.send("You have hit the wrong page");
 });
+
+//Middleware
+//Check user is logged in
+function isLoggedIn(req, res, next) {
+    if(req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+};
+
+//Check ownership of note
+function checkNoteOwnership(req, res, next) {
+    //Check if user is loggied in
+    if(req.isAuthenticated()) {
+        //If yes, find note
+        Note.findById(req.params.id, function(err, foundNote) {
+            if(err) {
+                console.log(err);
+            } else {
+                if(foundNote.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    res.redirect("back");
+                }
+            }
+        });
+    } else {
+        res.redirect("back");
+    }
+};
 
 app.listen(process.env.PORT || 3000, function() {
     console.log("Server started");
