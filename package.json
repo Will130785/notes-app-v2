@@ -1,0 +1,22 @@
+{
+  "name": "notes-app-v2",
+  "version": "1.0.0",
+  "description": "User can create an account and write, edit and delete notes",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Will130785/notes-app-v2.git"
+  },
+  "author": "Will Constable",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Will130785/notes-app-v2/issues"
+  },
+  "homepage": "https://github.com/Will130785/notes-app-v2#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
