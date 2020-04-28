@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Will130785/notes-app-v2#readme",
   "dependencies": {
+    "ejs": "^3.1.2",
     "express": "^4.17.1"
   }
 }

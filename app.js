@@ -1,20 +1,26 @@
 const express = require("express");
 const app = express();
 
+//APP CONFIG
+//Set template view engine
+app.set("view engine", "ejs");
+//Set static file location
+app.use(express.static("public"));
+
 //ROUTES
 //LANDING PAGE
 app.get("/", (req, res) => {
-    res.send("Welcome to the notes app");
+    res.render("landing");
 });
 
 //INDEX
 app.get("/notes", (req, res) => {
-    res.send("This will be the notes view page");
+    res.render("index");
 });
 
 //NEW
 app.get("/notes/new", (req, res) => {
-    res.send("This will be the create new note page");
+    res.render("new");
 });
 
 //CREATE
@@ -24,12 +30,12 @@ app.post("/notes", (req, res) => {
 
 //SHOW
 app.get("/notes/:id", (req, res) => {
-    res.send("This will be an individual note");
+    res.render("show");
 });
 
 //EDIT
 app.get("/notes/:id/edit", (req, res) => {
-    res.send("This will be the edit page");
+    res.render("edit");
 });
 
 //UPDATE
@@ -45,7 +51,7 @@ app.delete("/notes/:id", (req, res) => {
 //AUTH ROUTES
 //REGISTER
 app.get("/register", (req, res) => {
-    res.send("This will be the register page");
+    res.render("register");
 });
 
 app.post("/register", (req, res) => {
@@ -54,7 +60,7 @@ app.post("/register", (req, res) => {
 
 //LOGIN
 app.get("/login", (req, res) => {
-    res.send("This will be the login page");
+    res.render("login");
 });
 
 app.post("/login", (req, res) => {
