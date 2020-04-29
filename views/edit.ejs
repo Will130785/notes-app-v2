@@ -1,8 +1,9 @@
 <%- include("partials/header") %>
 
-<div class="container">
-    <h2 class="center">Edit note</h2>
-    <div class="card">
+<div class="container edit-container" style="padding-top: 50px">
+    <h3 class="center">Edit note</h3>
+    <div class="edit-form"">
+        <p>Edit the information in the form below</p>
         <form action="/notes/<%= note._id %>?_method=PUT" method="POST">
             <div class="form-group">
                 <input type="text" class="form-control" name="title" value="<%= note.title %>">

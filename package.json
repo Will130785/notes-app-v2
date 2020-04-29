@@ -4,7 +4,9 @@
   "description": "User can create an account and write, edit and delete notes",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "node:sass": "node-sass public/stylesheets/sass/main.scss public/stylesheets/css/style.css -w",
+    "devserver": "nodemon app.js",
+    "start": "npm-run-all --parallel node:sass devserver"
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,7 @@
   "homepage": "https://github.com/Will130785/notes-app-v2#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "connect-flash": "^0.1.1",
     "ejs": "^3.1.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
@@ -26,5 +29,9 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^6.0.1"
+  },
+  "devDependencies": {
+    "node-sass": "^4.14.0",
+    "npm-run-all": "^4.1.5"
   }
 }

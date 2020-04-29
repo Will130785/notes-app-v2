@@ -1,16 +1,16 @@
 <%- include("partials/header") %>
 
-<div class="container">
-    <div class="card">
+<div class="container show-container" style="padding-top: 50px">
+    <div class="card" style="width: 50%; margin: 0 auto;">
         <h3><%= note.title %></h3>
         <p><%= note.content %></p>
         <div class="media">
             <img src="<%= note.media %>" class="media-pic">
         </div>
         <% if(currentUser && note.author.id.equals(currentUser._id)) { %>
-            <a href="/notes/<%= note._id %>/edit" class="btn btn-warning">Edit</a>
+            <a href="/notes/<%= note._id %>/edit" class="btn editBtn btn-warning">Edit</a>
         <form action="/notes/<%= note._id %>?_method=DELETE" method="POST">
-            <input type="submit" class="btn btn-danger" value="Delete">
+            <input type="submit" class="btn btn-danger" value="Delete" style="width: 100%;">
         </form>
 
         <% } %>

@@ -1,8 +1,9 @@
 <%- include("partials/header") %>
 
-<div class="container">
-    <h2 class="center">Add note</h2>
-    <div class="card">
+<div class="container new-container" style="padding-top: 50px">
+    <h3 class="center">Add note</h3>
+    <div class="new-form">
+        <p>Fill in the form to create a new note</p>
         <form action="/notes" method="POST">
             <div class="form-group">
                 <input type="text" class="form-control" name="title" placeholder="Note title">

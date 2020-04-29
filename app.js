@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const flash = require("connect-flash");
 const passport = require("passport");
 const localStrategy = require("passport-local");
 const methodOverride = require("method-override");
@@ -14,11 +15,14 @@ app.set("view engine", "ejs");
 //Set static file location
 app.use(express.static("public"));
 //Set mongoDB location
-mongoose.connect("mongodb://localhost/notes-app", {useNewUrlParser: true, useUnifiedTopology: true});
+// mongoose.connect("mongodb://localhost/notes-app", {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect("mongodb+srv://will_constable:GC161113@cluster0-dsket.mongodb.net/notes-app?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true});
 //Use body parser
 app.use(bodyParser.urlencoded({extended: true}));
 //Set method overrride
 app.use(methodOverride("_method"));
+//Use flash
+app.use(flash());
 //PASSPORT CONFIG
 app.use(require("express-session")({
     secret: "This is a notes application",
@@ -34,6 +38,8 @@ passport.deserializeUser(User.deserializeUser());
 //Make current user available to all pages
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next();
 });
 
@@ -82,8 +88,9 @@ app.post("/notes", isLoggedIn, (req, res) => {
 //Create new database note
 Note.create(newNote, (err, newNote) => {
     if(err) {
-        console.log(err);
+        req.flash("error", "Your note could not be added");
     } else {
+        req.flash("success", "New note added");
         res.redirect("/notes");
 
     }
@@ -95,8 +102,8 @@ Note.create(newNote, (err, newNote) => {
 app.get("/notes/:id", (req, res) => {
     //Find note in DB
     Note.findById(req.params.id, (err, foundNote) => {
-        if(err) {
-            console.log(err);
+        if(err || !foundNote) {
+            req.flash("error", "Destination not found");
         } else {
             res.render("show", {note: foundNote});
         }
@@ -133,8 +140,9 @@ app.put("/notes/:id", checkNoteOwnership, (req, res) => {
     //Search for note and update DB
     Note.findByIdAndUpdate(req.params.id, updateNote, (err, updatedNote) => {
         if(err) {
-            console.log(err);
+            req.flash("error", "Could not update note");
         } else {
+            req.flash("success", "Note updated");
             res.redirect(`/notes/${req.params.id}`);
         }
     });
@@ -145,9 +153,10 @@ app.delete("/notes/:id", checkNoteOwnership, (req, res) => {
     //Find item in DB and delete
     Note.findByIdAndRemove(req.params.id, (err, note) => {
         if(err) {
-            console.log(err);
+            req.flash("error", "Could not delete note");
         } else {
             note.remove();
+            req.flash("success", "Note deleted");
             res.redirect("/notes");
         }
     });
@@ -169,6 +178,7 @@ app.post("/register", (req, res) => {
         } else {
             //Authenticate user with passport-local
             passport.authenticate("local")(req, res, function() {
+                req.flash("success", "You have been successfully registered");
                 res.redirect("/notes");
             });
         }
@@ -185,12 +195,13 @@ app.post("/login", passport.authenticate("local",
     successRedirect: "/notes",
     failureRedirect: "/login"
 }), (req, res) => {
-
+    req.flash("success", "You have been successfully logged in");
 });
 
 //LOGOUT
 app.get("/logout", (req, res) => {
     req.logout();
+    req.flash("success", "You have been successfully logged out");
     res.redirect("/notes");
 });
 
@@ -205,6 +216,7 @@ function isLoggedIn(req, res, next) {
     if(req.isAuthenticated()) {
         return next();
     }
+    req.flash("error", "You need to be signed in");
     res.redirect("/login");
 };
 
@@ -214,12 +226,14 @@ function checkNoteOwnership(req, res, next) {
     if(req.isAuthenticated()) {
         //If yes, find note
         Note.findById(req.params.id, function(err, foundNote) {
-            if(err) {
-                console.log(err);
+            if(err || !foundNote) {
+                req.flash("error", "You do not have permission to do that");
+                res.redirect("back");
             } else {
                 if(foundNote.author.id.equals(req.user._id)) {
                     next();
                 } else {
+                    req.flash("error", "You do not have permission to do that");
                     res.redirect("back");
                 }
             }
