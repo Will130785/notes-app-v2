@@ -6,7 +6,7 @@
   "scripts": {
     "node:sass": "node-sass public/stylesheets/sass/main.scss public/stylesheets/css/style.css -w",
     "devserver": "nodemon app.js",
-    "start": "npm-run-all --parallel node:sass devserver"
+    "start": "nodemon app.js"
   },
   "repository": {
     "type": "git",
